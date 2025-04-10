@@ -5,12 +5,9 @@
  font-family: 'Mulish', sans-serif;
  transition: 0.3s all ease-in-out;
 }
-body{
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
-background-color: #fff;
+
+body {
+ margin: 0;
 }
 .shadow-wrap{
  border-radius: 5px;

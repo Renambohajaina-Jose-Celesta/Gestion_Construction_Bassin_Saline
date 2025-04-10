@@ -1,50 +1,59 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-5">
     <h1 class="text-center mb-4">Page d'accueil</h1>
     
-    <nav class="nav justify-content-end mb-4">
-        <a class="btn btn-danger" href="{% url 'base:logout' %}">Déconnexion</a>
-    </nav>
-
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><a class="nav-link" href="{% url 'base:projets' %}">Projets</a></h5>
-                </div>
-            </div>
+    <!-- Conteneur pour l'image et le menu -->
+    <div class="row mb-4">
+        <!-- Image à gauche -->
+        <div class="col-md-6 p-0"> <!-- Utilisation de p-0 pour supprimer le padding -->
+            <img src="{% static 'image/basin.jpg' %}" alt="Logo" class="img-fluid rounded shadow" style="margin: 0;"> <!-- Image responsive -->
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><a class="nav-link" href="{% url 'base:bassins' %}">Bassins</a></h5>
+        
+        <!-- Menu à droite -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-project-diagram fa-2x mb-2 text-primary"></i>
+                            <h5 class="card-title"><a class="nav-link" href="{% url 'base:projets' %}">Projets</a></h5>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><a class="nav-link" href="{% url 'base:fournisseurs' %}">Fournisseurs</a></h5>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-water fa-2x mb-2 text-info"></i>
+                            <h5 class="card-title"><a class="nav-link" href="{% url 'base:bassins' %}">Bassins</a></h5>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Ajoutez d'autres cartes ici si nécessaire -->
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><a class="nav-link" href="{% url 'base:materiaux' %}">Matériaux</a></h5>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-truck fa-2x mb-2 text-success"></i>
+                            <h5 class="card-title"><a class="nav-link" href="{% url 'base:fournisseurs' %}">Fournisseurs</a></h5>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><a class="nav-link" href="{% url 'base:volumes' %}">Volumes</a></h5>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-tools fa-2x mb-2 text-warning"></i>
+                            <h5 class="card-title"><a class="nav-link" href="{% url 'base:materiaux' %}">Matériaux</a></h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar fa-2x mb-2 text-danger"></i>
+                            <h5 class="card-title"><a class="nav-link" href="{% url 'base:volumes' %}">Volumes</a></h5>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

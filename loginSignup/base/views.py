@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+
+from .forms import ProjetForm
 
 from .models import BassinSalins, Fournisseurs, Materiaux, Projet, Volumes
 
@@ -20,9 +22,41 @@ def authView(request):
   form = UserCreationForm()
  return render(request, "registration/signup.html", {"form": form})
 
+@login_required
 def projets(request):
     projets_list = Projet.objects.all()
     return render(request, 'projets.html', {'projets': projets_list})
+
+@login_required
+def projet_add(request):
+    if request.method == "POST":
+        form = ProjetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('projets')
+    else:
+        form = ProjetForm()
+    return render(request, 'projet_form.html', {'form': form})
+
+@login_required
+def projet_edit(request, pk):
+    projet = get_object_or_404(Projet, pk=pk)
+    if request.method == "POST":
+        form = ProjetForm(request.POST, instance=projet)
+        if form.is_valid():
+            form.save()
+            return redirect('projets')
+    else:
+        form = ProjetForm(instance=projet)
+    return render(request, 'projet_form.html', {'form': form})
+
+@login_required
+def projet_delete(request, pk):
+    projet = get_object_or_404(Projet, pk=pk)
+    if request.method == "POST":
+        projet.delete()
+        return redirect('projets')
+    return render(request, 'projet_confirm_delete.html', {'projet': projet})
 
 def bassins(request):
     bassins_list = BassinSalins.objects.all()
