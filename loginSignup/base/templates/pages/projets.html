@@ -3,11 +3,29 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4">Liste des Projets</h2>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Liste des Projets</h2>
+        {% comment %} <a href="{% url 'base:home' %}" class="btn btn-secondary">
+            <i class="fas fa-home me-2"></i>Retour à l'accueil
+        </a> {% endcomment %}
+    </div>
+
     <!-- Bouton Ajouter -->
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProjectModal">
         <i class="fas fa-plus-circle me-2"></i>Ajouter un Projet
     </button>
+
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+                <li>{{ field }}: {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
     <table class="table table-striped table-bordered table-hover">
         <thead class="thead-dark">
@@ -23,73 +41,41 @@
         <tbody>
             {% for projet in projets %}
             <tr>
-                <td>{{ projet.Id_projet }}</td>  <!-- Utilisation du champ Nom_projet -->
-                <td>{{ projet.Nom_projet }}</td>  <!-- Utilisation du champ Nom_projet -->
-                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->
-                <td>{{ projet.Date_debut }}</td       <!-- Utilisation du champ Date_debut -->
-                <td>{{ projet.Date_fin }}</td         <!-- Utilisation du champ Date_fin -->
+                <td>{{ projet.Id_projet }}</td>
+                <td>{{ projet.Nom_projet }}</td>
+                <td>{{ projet.Lieu }}</td>
+                <td>{{ projet.Date_debut }}</td>
+                <td>{{ projet.Date_fin }}</td>
                 <td>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ projet.Id_projet }}">
+                    <button type="button"
+                        class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editProjectModal"
+                        data-id="{{ projet.Id_projet }}"
+                        data-nom="{{ projet.Nom_projet }}"
+                        data-lieu="{{ projet.Lieu }}"
+                       data-debut="{{ projet.Date_debut|date:'Y-m-d' }}"
+    data-fin="{{ projet.Date_fin|date:'Y-m-d' }}"
+                    >
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
-                    {% comment %} <a href="{% url 'base:projet_delete' projet.Id_projet %}" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash-alt me-1"></i>Supprimer
-                    </a> {% endcomment %}
-                </td>
-            </tr>
+                    <button type="button"
+    class="btn btn-danger btn-sm"
+    data-bs-toggle="modal"
+    data-bs-target="#deleteProjectModal"
+    data-id="{{ projet.Id_projet }}"
+>
+    <i class="fas fa-trash-alt me-1"></i>Supprimer
+</button>
 
-            <!-- Modal pour Modifier le Projet -->
-            {% comment %} <div class="modal fade" id="editProjectModal{{ projet.Id_projet }}" tabindex="-1" aria-labelledby="editProjectModalLabel{{ projet.Id_projet }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post" action="{% url 'base:projet_edit' projet.Id_projet %}">
-                            {% csrf_token %}
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editProjectModalLabel{{ projet.Id_projet }}">
-                                    <i class="fas fa-edit me-2"></i>Modifier le Projet
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="id_nom_projet" class="form-label">Nom du Projet</label>
-                                    <input type="text" class="form-control" id="id_nom_projet" name="nom_projet" value="{{ projet.Nom_projet }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_lieu" class="form-label">Lieu</label>
-                                    <input type="text" class="form-control" id="id_lieu" name="lieu" value="{{ projet.Lieu }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_date_debut" class="form-label">Date de Début</label>
-                                    <input type="date" class="form-control" id="id_date_debut" name="date_debut" value="{{ projet.Date_debut }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_date_fin" class="form-label">Date de Fin</label>
-                                    <input type="date" class="form-control" id="id_date_fin" name="date_fin" value="{{ projet.Date_fin }}" required>
-                                </div>
-                            </div>
-                            <div class=" modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i>Annuler
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i>Enregistrer
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> {% endcomment %}
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center text-muted">Aucun projet disponible.</td>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<!-- Modal pour Ajouter un Projet -->
+<!-- Modal Ajouter -->
 <div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -99,36 +85,135 @@
                     <h5 class="modal-title" id="addProjectModalLabel">
                         <i class="fas fa-plus-circle me-2"></i>Ajouter un Projet
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_nom_projet" class="form-label">Nom du Projet</label>
-                        <input type="text" class="form-control" id="id_nom_projet" name="nom_projet" required>
+                        <label class="form-label">Nom du Projet</label>
+                        <input type="text" class="form-control" name="Nom_projet" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_lieu" class="form-label">Lieu</label>
-                        <input type="text" class="form-control" id="id_lieu" name="lieu" required>
+                        <label class="form-label">Lieu</label>
+                        <input type="text" class="form-control" name="Lieu" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_date_debut" class="form-label">Date de Début</label>
-                        <input type="date" class="form-control" id="id_date_debut" name="date_debut" required>
+                        <label class="form-label">Date de Début</label>
+                        <input type="date" class="form-control" name="Date_debut" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_date_fin" class="form-label">Date de Fin</label>
-                        <input type="date" class="form-control" id="id_date_fin" name="date_fin" required>
+                        <label class="form-label">Date de Fin</label>
+                        <input type="date" class="form-control" name="Date_fin" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Annuler
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i>Ajouter
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-{% endblock content %}
+
+<!-- Modal Modifier Global (en dehors du tableau) -->
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-labelledby="editProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="editProjectForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProjectModalLabel">
+                        <i class="fas fa-edit me-2"></i>Modifier le Projet
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="mb-3">
+                        <label class="form-label">Nom du Projet</label>
+                        <input type="text" class="form-control" id="edit_nom" name="Nom_projet" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lieu</label>
+                        <input type="text" class="form-control" id="edit_lieu" name="Lieu" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de Début</label>
+                        <input type="date" class="form-control" id="edit_debut" name="Date_debut" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de Fin</label>
+                        <input type="date" class="form-control" id="edit_fin" name="Date_fin" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" id="deleteProjectForm">
+          {% csrf_token %}
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteProjectModalLabel">
+              <i class="fas fa-exclamation-triangle me-2"></i>Confirmation de Suppression
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+
+<!-- JS pour pré-remplir le modal -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var editModal = document.getElementById("editProjectModal");
+    editModal.addEventListener("show.bs.modal", function (event) {
+        var button = event.relatedTarget;
+        var id = button.getAttribute("data-id");
+        var nom = button.getAttribute("data-nom");
+        var lieu = button.getAttribute("data-lieu");
+        var debut = button.getAttribute("data-debut");
+        var fin = button.getAttribute("data-fin");
+
+        document.getElementById("edit_nom").value = nom;
+        document.getElementById("edit_lieu").value = lieu;
+        document.getElementById("edit_debut").value = debut;
+        document.getElementById("edit_fin").value = fin;
+
+        // Modifier l'action du formulaire
+        var form = document.getElementById("editProjectForm");
+        form.action = `/projets/edit/${id}/`;  // À adapter selon ton URL
+    });
+});
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var deleteModal = document.getElementById("deleteProjectModal");
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute("data-id");
+    
+            var form = document.getElementById("deleteProjectForm");
+            form.action = `/projets/delete/${id}/`;  // Adapte cette URL selon ton projet Django
+        });
+    });
+    </script>
+    
+{% endblock %}

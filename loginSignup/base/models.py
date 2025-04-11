@@ -4,8 +4,8 @@ class Projet(models.Model):
     Id_projet = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
     Nom_projet = models.CharField(max_length=50)
     Lieu = models.CharField(max_length=30)
-    Date_debut = models.CharField(max_length=19)
-    Date_fin = models.CharField(max_length=19)
+    Date_debut = models.DateField(max_length=19)
+    Date_fin = models.DateField(max_length=19)
 
 class Volumes(models.Model):
     Id_volume = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
@@ -22,12 +22,12 @@ class BassinSalins(models.Model):
 
 class Fournisseurs(models.Model):
     Id_fournisseur = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
-    Nom_fournisseur = models.CharField(max_length=30, null=True, blank=True)
-    Adr_fournisseur = models.CharField(max_length=37, null=True, blank=True)
+    Nom_fournisseur = models.CharField(max_length=30)
+    Adr_fournisseur = models.CharField(max_length=37)
     Tel_fournisseur = models.BigIntegerField(null=True, blank=True)
 
 class Materiaux(models.Model):
     Id_materiau = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
-    Nom_materiau = models.CharField(max_length=50, null=True, blank=True)
-    Unite = models.CharField(max_length=50, null=True, blank=True)
+    Nom_materiau = models.CharField(max_length=50)
+    Unite = models.CharField(max_length=50)
     Quantite_stock = models.IntegerField(null=True, blank=True)
