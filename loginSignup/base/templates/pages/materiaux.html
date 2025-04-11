@@ -6,27 +6,25 @@
     <h2 class="mb-4">Liste des Projets</h2>
     <!-- Bouton Ajouter -->
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-        <i class="fas fa-plus-circle me-2"></i>Ajouter un Projet
+        <i class="fas fa-plus-circle me-2"></i>Ajouter un Materiaux
     </button>
 
     <table class="table table-striped table-bordered table-hover">
         <thead class="thead-dark">
             <tr>
                 <th>Id</th>
-                <th>Nom du Projet</th>
-                <th>Lieu</th>
-                <th>Date de Début</th>
-                <th>Date de Fin</th>
+                <th>Nom du Materiaux</th>
+                <th>Unite</th>
+                <th>Quantite du Stock</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for projet in projets %}
             <tr>
-                <td>{{ projet.Id_projet }}</td>  <!-- Utilisation du champ Nom_projet -->
                 <td>{{ projet.Nom_projet }}</td>  <!-- Utilisation du champ Nom_projet -->
-                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->
-                <td>{{ projet.Date_debut }}</td       <!-- Utilisation du champ Date_debut -->
+                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->      <!-- Utilisation du champ Date_debut -->
+                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->      <!-- Utilisation du champ Date_debut -->
                 <td>{{ projet.Date_fin }}</td         <!-- Utilisation du champ Date_fin -->
                 <td>
                     <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ projet.Id_projet }}">

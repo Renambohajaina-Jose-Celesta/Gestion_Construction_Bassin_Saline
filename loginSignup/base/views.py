@@ -25,7 +25,7 @@ def authView(request):
 @login_required
 def projets(request):
     projets_list = Projet.objects.all()
-    return render(request, 'projets.html', {'projets': projets_list})
+    return render(request, 'pages/projets.html', {'projets': projets_list})
 
 @login_required
 def projet_add(request):
@@ -33,10 +33,8 @@ def projet_add(request):
         form = ProjetForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('projets')
-    else:
-        form = ProjetForm()
-    return render(request, 'projet_form.html', {'form': form})
+            return redirect('base:projets')
+    return redirect('base:projets')  # Redirection même si le formulaire n'est pas valide
 
 @login_required
 def projet_edit(request, pk):
@@ -46,30 +44,27 @@ def projet_edit(request, pk):
         if form.is_valid():
             form.save()
             return redirect('projets')
-    else:
-        form = ProjetForm(instance=projet)
-    return render(request, 'projet_form.html', {'form': form})
 
 @login_required
 def projet_delete(request, pk):
     projet = get_object_or_404(Projet, pk=pk)
     if request.method == "POST":
         projet.delete()
-        return redirect('projets')
-    return render(request, 'projet_confirm_delete.html', {'projet': projet})
+        return redirect('base:projets')
+    return render('base:projets')
 
 def bassins(request):
     bassins_list = BassinSalins.objects.all()
-    return render(request, 'bassins.html', {'bassins': bassins_list})
+    return render(request, 'pages/bassins.html', {'bassins': bassins_list})
 
 def fournisseurs(request):
     fournisseurs_list = Fournisseurs.objects.all()
-    return render(request, 'fournisseurs.html', {'fournisseurs': fournisseurs_list})
+    return render(request, 'pages/fournisseurs.html', {'fournisseurs': fournisseurs_list})
 
 def materiaux(request):
     materiaux_list = Materiaux.objects.all()
-    return render(request, 'materiaux.html', {'materiaux': materiaux_list})
+    return render(request, 'pages/materiaux.html', {'materiaux': materiaux_list})
 
 def volumes(request):
     volumes_list = Volumes.objects.all()
-    return render(request, 'volumes.html', {'volumes': volumes_list})
+    return render(request, 'pages/volumes_eaux.html', {'volumes': volumes_list})
