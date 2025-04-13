@@ -7,16 +7,14 @@
 
     {% if messages %}
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-      {% for message in messages %}
+        {% for message in messages %}
         <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="d-flex">
-            <div class="toast-body">
-              {{ message }}
+            <div class="d-flex">
+                <div class="toast-body">{{ message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
             </div>
-            <button type ="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
-          </div>
         </div>
-      {% endfor %}
+        {% endfor %}
     </div>
     {% endif %}
 
@@ -29,6 +27,7 @@
         <thead class="thead-dark">
             <tr>
                 <th>Id</th>
+                <th>Projet</th>
                 <th>Nom du Matériau</th>
                 <th>Unité</th>
                 <th>Quantité en Stock</th>
@@ -39,86 +38,20 @@
             {% for materiau in materiaux %}
             <tr>
                 <td>{{ materiau.Id_materiau }}</td>
+                <td>{% if materiau.Id_projet %}{{ materiau.Id_projet.Nom_projet }}{% else %}-{% endif %}</td>
                 <td>{{ materiau.Nom_materiau }}</td>
                 <td>{{ materiau.Unite }}</td>
                 <td>{{ materiau.Quantite_stock }}</td>
                 <td>
-                    <!-- Bouton Modifier -->
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editMateriauModal{{ materiau.Id_materiau }}">
+                    <!-- Boutons -->
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editMateriauModal{{ materiau.Id_materiau }}">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
-
-                    <!-- Bouton Supprimer -->
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteMateriauModal{{ materiau.Id_materiau }}">
                         <i class="fas fa-trash-alt me-1"></i>Supprimer
                     </button>
                 </td>
             </tr>
-
-            <!-- Modal Modifier -->
-            <div class="modal fade" id="editMateriauModal{{ materiau.Id_materiau }}" tabindex="-1" aria-labelledby="editMateriauModalLabel{{ materiau.Id_materiau }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post" action="{% url 'base:materiau_edit' materiau.Id_materiau %}">
-                            {% csrf_token %}
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editMateriauModalLabel{{ materiau.Id_materiau }}">
-                                    <i class="fas fa-edit me-2"></i>Modifier le Matériau
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Nom du Matériau</label>
-                                    <input type="text" class="form-control" name="Nom_materiau" value="{{ materiau.Nom_materiau }}" required>                               
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Unité</label>
-                                    <select class="form-select" name="Unite" required>
-                                        <option value="kg" {% if materiau.Unite == "kg" %}selected{% endif %}>Kilogramme</option>
-                                        <option value="g" {% if materiau.Unite == "g" %}selected{% endif %}>Grammes</option>
-                                        <option value="l" {% if materiau.Unite == "l" %}selected{% endif %}>Litres</option>
-                                        <option value="m" {% if materiau.Unite == "m" %}selected{% endif %}>Mètres</option>
-                                        <option value="pcs" {% if materiau.Unite == "pcs" %}selected{% endif %}>Pièces</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Quantité en Stock</label>
-                                    <input type="number" class="form-control" name="Quantite_stock" value="{{ materiau.Quantite_stock }}">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Supprimer -->
-            <div class="modal fade" id="deleteMateriauModal{{ materiau.Id_materiau }}" tabindex="-1" aria-labelledby="deleteMateriauModalLabel{{ materiau.Id_materiau }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post" action="{% url 'base:materiau_delete' materiau.Id_materiau %}">
-                            {% csrf_token %}
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title" id="deleteMateriauModalLabel{{ materiau.Id_materiau }}">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmation
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Êtes-vous sûr de vouloir supprimer <strong>{{ materiau.Nom_materiau }}</strong> ?</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" class="btn btn-danger">Supprimer</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             {% endfor %}
         </tbody>
     </table>
@@ -127,56 +60,54 @@
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             {% if materiaux.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1" aria-label="Première">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ materiaux.previous_page_number }}" aria-label="Précédente">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo;&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ materiaux.previous_page_number }}">&laquo;</a>
+            </li>
             {% endif %}
 
             {% for num in materiaux.paginator.page_range %}
                 {% if materiaux.number == num %}
-                    <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% else %}
                     <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
                 {% endif %}
             {% endfor %}
 
             {% if materiaux.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ materiaux.next_page_number }}" aria-label="Suivante">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ materiaux.paginator.num_pages }}" aria-label="Dernière">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ materiaux.next_page_number }}">&raquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ materiaux.paginator.num_pages }}">&raquo;&raquo;</a>
+            </li>
             {% endif %}
         </ul>
     </nav>
 </div>
 
 <!-- Modal Ajouter -->
-<div class="modal fade" id="addMateriauModal" tabindex="-1 ```html
-" aria-labelledby="addMateriauModalLabel" aria-hidden="true">
+<div class="modal fade" id="addMateriauModal" tabindex="-1" aria-labelledby="addMateriauModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" action="{% url 'base:materiau_add' %}">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addMateriauModalLabel">
-                        <i class="fas fa-plus-circle me-2"></i>Ajouter un Matériau
-                    </h5>
+                    <h5 class="modal-title" id="addMateriauModalLabel"><i class="fas fa-plus-circle me-2"></i>Ajouter un Matériau</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Projet</label>
+                        <select class="form-select" name="Id_projet">
+                            <option value="">Aucun</option>
+                            {% for projet in projets %}
+                            <option value="{{ projet.id }}">{{ projet.Nom_projet }} durée de {{ projet.Dure }} jours</option>
+                            {% endfor %}
+                        </select>
+                    </div>                    
                     <div class="mb-3">
                         <label class="form-label">Nom du Matériau</label>
                         <input type="text" class="form-control" name="Nom_materiau" required>
@@ -208,4 +139,81 @@
         </div>
     </div>
 </div>
+
+<!-- Modales Modifier & Supprimer hors de la table -->
+{% for materiau in materiaux %}
+<!-- Modal Modifier -->
+<div class="modal fade" id="editMateriauModal{{ materiau.Id_materiau }}" tabindex="-1" aria-labelledby="editMateriauModalLabel{{ materiau.Id_materiau }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'base:materiau_edit' materiau.Id_materiau %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMateriauModalLabel{{ materiau.Id_materiau }}">
+                        <i class="fas fa-edit me-2"></i>Modifier le Matériau
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Projet</label>
+                        <select class="form-select" name="Id_projet">
+                            <option value="{{ projet.id }}" {% if projet.id == materiau.Id_projet.id %}selected{% endif %}>
+                                {{ projet.Nom_projet }} durée de {{ projet.Dure }} jours
+                            </option>                            
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nom du Matériau</label>
+                        <input type="text" class="form-control" name="Nom_materiau" value="{{ materiau.Nom_materiau }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Unité</label>
+                        <select class="form-select" name="Unite" required>
+                            <option value="kg" {% if materiau.Unite == "kg" %}selected{% endif %}>Kilogramme</option>
+                            <option value="g" {% if materiau.Unite == "g" %}selected{% endif %}>Grammes</option>
+                            <option value="l" {% if materiau.Unite == "l" %}selected{% endif %}>Litres</option>
+                            <option value="m" {% if materiau.Unite == "m" %}selected{% endif %}>Mètres</option>
+                            <option value="pcs" {% if materiau.Unite == "pcs" %}selected{% endif %}>Pièces</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantité en Stock</label>
+                        <input type="number" class="form-control" name="Quantite_stock" value="{{ materiau.Quantite_stock }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Supprimer -->
+<div class="modal fade" id="deleteMateriauModal{{ materiau.Id_materiau }}" tabindex="-1" aria-labelledby="deleteMateriauModalLabel{{ materiau.Id_materiau }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'base:materiau_delete' materiau.Id_materiau %}">
+                {% csrf_token %}
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteMateriauModalLabel{{ materiau.Id_materiau }}">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmation
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer <strong>{{ materiau.Nom_materiau }}</strong> ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

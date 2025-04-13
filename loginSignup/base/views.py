@@ -104,17 +104,33 @@ def materiaux(request):
     paginator = Paginator(materiaux_list, 10)  # Affiche 10 matériaux par page
     page_number = request.GET.get('page')
     materiaux = paginator.get_page(page_number)
-    return render(request, 'pages/materiaux.html', {'materiaux': materiaux})
+    
+    projets = Projet.objects.all()  # <-- Cette ligne manquait
+    
+    return render(request, 'pages/materiaux.html', {
+        'materiaux': materiaux,
+        'projets': projets
+    })
+
 
 def materiau_add(request):
     if request.method == "POST":
-        form = MateriauForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('base:materiaux')
-    else:
-        form = MateriauForm()
-    return render(request, 'pages/materiaux.html', {'form': form})
+        nom = request.POST.get('Nom_materiau')
+        unite = request.POST.get('Unite')
+        quantite = request.POST.get('Quantite_stock') or None
+        id_projet = request.POST.get('Id_projet') or None
+
+        projet = Projet.objects.get(id=id_projet) if id_projet else None
+
+        Materiaux.objects.create(
+            Nom_materiau=nom,
+            Unite=unite,
+            Quantite_stock=quantite,
+            Id_projet=projet
+        )
+
+        messages.success(request, "Matériau ajouté avec succès.")
+        return redirect('base:materiaux')
 
 def materiau_edit(request, pk):
     materiau = get_object_or_404(Materiaux, pk=pk)
@@ -131,7 +147,7 @@ def materiau_delete(request, pk):
     materiau = get_object_or_404(Materiaux, pk=pk)
     if request.method == "POST":
         materiau.delete()
-        return redirect('base:materiaux_list')
+        return redirect('base:materiaux')
     return render(request, 'pages/materiaux.html', {'materiau': materiau})
 
 def volumes(request):

@@ -31,7 +31,7 @@
                 <td>{{ projet.Date_debut }}</td       <!-- Utilisation du champ Date_debut -->
                 <td>{{ projet.Date_fin }}</td         <!-- Utilisation du champ Date_fin -->
                 <td>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ projet.Id_projet }}">
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ projet.Id_projet }}">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
                     {% comment %} <a href="{% url 'base:projet_delete' projet.Id_projet %}" class="btn btn-danger btn-sm">

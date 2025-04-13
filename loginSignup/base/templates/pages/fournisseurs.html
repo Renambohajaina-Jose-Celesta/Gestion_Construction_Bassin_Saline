@@ -45,7 +45,7 @@
                 <td>{{ fournisseur.Tel_fournisseur }}</td>
                 <td>
                     <!-- Bouton Modifier -->
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editFournisseurModal{{ fournisseur.Id_fournisseur }}">
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editFournisseurModal{{ fournisseur.Id_fournisseur }}">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
 
@@ -178,7 +178,8 @@
 <!-- Modal Supprimer -->
 <div class="modal fade" id="deleteFournisseurModal{{ fournisseur.Id_fournisseur }}" tabindex="-1" aria-labelledby="deleteFournisseurModalLabel{{ fournisseur.Id_fournisseur }}" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content <form method="post" action="{% url 'base:fournisseur_delete' fournisseur.Id_fournisseur %}">
+        <div class="modal-content"> 
+            <form method="post" action="{% url 'base:fournisseur_delete' fournisseur.Id_fournisseur %}">
                 {% csrf_token %}
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="deleteFournisseurModalLabel{{ fournisseur.Id_fournisseur }}">

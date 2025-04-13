@@ -88,7 +88,7 @@
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i>Connexion</a>
+            {% comment %} <a class="nav-link" href="{% url 'authView' %}"><i class="fas fa-sign-in-alt me-1"></i>Connexion</a> {% endcomment %}
           </li>
           {% endif %}
         </ul>
@@ -96,7 +96,7 @@
     </div>
   </nav>
 
-  {% block content %}{% endblock content %}
+      {% block content %}{% endblock content %}
 
   <!-- Pied de page -->
   {% comment %} <footer class="bg-dark text-white py-4 mt-5">

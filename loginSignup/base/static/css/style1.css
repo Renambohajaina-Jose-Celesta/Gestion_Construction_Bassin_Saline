@@ -99,8 +99,8 @@ body::before {
     border-radius: 15px;
     box-shadow: 0 8px 32px rgba(0, 105, 192, 0.2);
     padding: 30px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     backdrop-filter: blur(5px);
 }
 

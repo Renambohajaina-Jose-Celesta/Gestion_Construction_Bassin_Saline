@@ -3,9 +3,10 @@ from django.db import models
 class Projet(models.Model):
     Id_projet = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
     Nom_projet = models.CharField(max_length=50)
-    Lieu = models.CharField(max_length=30)
+    Description = models.CharField(max_length=100, null=True)
     Date_debut = models.DateField(max_length=19)
     Date_fin = models.DateField(max_length=19)
+    Dure = models.IntegerField(null=True, blank=True)
 
 class Volumes(models.Model):
     Id_volume = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
@@ -21,13 +22,14 @@ class BassinSalins(models.Model):
     Date_construction = models.CharField(max_length=19, null=True, blank=True)
 
 class Fournisseurs(models.Model):
-    Id_fournisseur = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
-    Nom_fournisseur = models.CharField(max_length=30)
-    Adr_fournisseur = models.CharField(max_length=37)
+    Id_fournisseur = models.AutoField(primary_key=True)
+    Nom_fournisseur = models.CharField(max_length=30, default='Non spécifiée')
+    Adr_fournisseur = models.CharField(max_length=37, default='Non spécifiée')  # Valeur par défaut ajoutée
     Tel_fournisseur = models.BigIntegerField(null=True, blank=True)
 
 class Materiaux(models.Model):
     Id_materiau = models.AutoField(primary_key=True)  # Clé primaire auto-incrémentée
-    Nom_materiau = models.CharField(max_length=50)
-    Unite = models.CharField(max_length=50)
+    Id_projet = models.ForeignKey(Projet, on_delete=models.CASCADE, null=True, blank=True)
+    Nom_materiau = models.CharField(max_length=50, default='Non spécifiée')
+    Unite = models.CharField(max_length=50, default='Non spécifiée')
     Quantite_stock = models.IntegerField(null=True, blank=True)
