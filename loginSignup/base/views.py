@@ -65,12 +65,20 @@ def delete_projet(request, pk):
 
 @login_required
 def bassins(request):
-    bassins_list = BassinSalins.objects.all()
-    projets = Projet.objects.all()  # Récupérer tous les projets
-    volumes = Volumes.objects.all()  # Récupérer tous les volumes
+    # Récupérer tous les bassins
+    bassins_list = BassinSalins.objects.all().order_by('Id_bassin')  # Tri par ID croissant
+    
+    # Pagination - 10 bassins par page
+    paginator = Paginator(bassins_list, 10)
+    page_number = request.GET.get('page')
+    bassins_page = paginator.get_page(page_number)
+    
+    # Récupérer les projets et volumes pour les formulaires
+    projets = Projet.objects.all()
+    volumes = Volumes.objects.all()
     
     return render(request, 'pages/bassins.html', {
-        'bassins': bassins_list,
+        'bassins': bassins_page,  # Notez que nous passons l'objet page, pas la liste complète
         'projets': projets,
         'volumes': volumes,
     })
