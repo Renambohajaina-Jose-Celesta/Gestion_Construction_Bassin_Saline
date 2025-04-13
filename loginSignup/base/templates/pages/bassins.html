@@ -4,121 +4,107 @@
 {% block content %}
 <div class="container">
     <h2 class="mb-4">Liste des Bassins</h2>
-    <!-- Bouton Ajouter -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-        <i class="fas fa-plus-circle me-2"></i>Ajouter un Bassins
+
+    {% if form_errors %}
+    <div class="alert alert-danger mb-3">
+        <h5><i class="fas fa-exclamation-triangle me-2"></i>Erreurs dans le formulaire :</h5>
+        <ul>
+            {% for field, errors in form_errors.items %}
+                <li><strong>{{ field }}</strong>: {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addBassinModal">
+        <i class="fas fa-plus-circle me-2"></i>Ajouter un Bassin
     </button>
 
     <table class="table table-striped table-bordered table-hover">
         <thead class="thead-dark">
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <th>Projet</th>
                 <th>Volume d'eaux</th>
-                <th>Surface du bassins</th>
-                <th>Capacite</th>
-                <th>Date du construction</th>
+                <th>Surface du bassin (m²)</th>
+                <th>Capacité (litres)</th>
+                <th>Date de construction</th>
+                <th>Nombre de bassins</th>
+                <th>Sel produit (tonnes)</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for projet in projets %}
+            {% for bassin in bassins %}
             <tr>
-                <td>{{ projet.Nom_projet }}</td>  <!-- Utilisation du champ Nom_projet -->
-                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->
-                <td>{{ projet.Lieu }}</td            <!-- Utilisation du champ Lieu -->
-                <td>{{ projet.Date_debut }}</td       <!-- Utilisation du champ Date_debut -->
-                <td>{{ projet.Date_debut }}</td       <!-- Utilisation du champ Date_debut -->
-                <td>{{ projet.Date_fin }}</td         <!-- Utilisation du champ Date_fin -->
+                <td>{{ bassin.Id_bassin }}</td>
+                <td>{{ bassin.Id_projet.Nom_projet }}</td>
+                <td>{{ bassin.Id_volume.Volume_disponible }} litres</td>
+                <td>{{ bassin.Surface_bassin }}</td>
+                <td>{{ bassin.Capacite }}</td>
+                <td>{{ bassin.Date_construction }}</td>
+                <td>{{ bassin.Nb_bassin }}</td>
+                <td>{{ bassin.Sel_produit|floatformat:2 }} tonnes</td>
                 <td>
-                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ projet.Id_projet }}">
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editBassinModal{{ bassin.Id_bassin }}">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
-                    {% comment %} <a href="{% url 'base:projet_delete' projet.Id_projet %}" class="btn btn-danger btn-sm">
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteBassinModal{{ bassin.Id_bassin }}">
                         <i class="fas fa-trash-alt me-1"></i>Supprimer
-                    </a> {% endcomment %}
+                    </button>
                 </td>
             </tr>
-
-            <!-- Modal pour Modifier le Projet -->
-            {% comment %} <div class="modal fade" id="editProjectModal{{ projet.Id_projet }}" tabindex="-1" aria-labelledby="editProjectModalLabel{{ projet.Id_projet }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post" action="{% url 'base:projet_edit' projet.Id_projet %}">
-                            {% csrf_token %}
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editProjectModalLabel{{ projet.Id_projet }}">
-                                    <i class="fas fa-edit me-2"></i>Modifier le Projet
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="id_nom_projet" class="form-label">Nom du Projet</label>
-                                    <input type="text" class="form-control" id="id_nom_projet" name="nom_projet" value="{{ projet.Nom_projet }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_lieu" class="form-label">Lieu</label>
-                                    <input type="text" class="form-control" id="id_lieu" name="lieu" value="{{ projet.Lieu }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_date_debut" class="form-label">Date de Début</label>
-                                    <input type="date" class="form-control" id="id_date_debut" name="date_debut" value="{{ projet.Date_debut }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_date_fin" class="form-label">Date de Fin</label>
-                                    <input type="date" class="form-control" id="id_date_fin" name="date_fin" value="{{ projet.Date_fin }}" required>
-                                </div>
-                            </div>
-                            <div class=" modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i>Annuler
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i>Enregistrer
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> {% endcomment %}
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center text-muted">Aucun projet disponible.</td>
+                <td colspan="9" class="text-center text-muted">Aucun bassin disponible.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<!-- Modal pour Ajouter un Projet -->
-<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+<!-- Modal pour Ajouter un Bassin -->
+<div class="modal fade" id="addBassinModal" tabindex="-1" aria-labelledby="addBassinModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{% url 'base:projet_add' %}">
+            <form method="post" action="{% url 'base:bassin_add' %}">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addProjectModalLabel">
-                        <i class="fas fa-plus-circle me-2"></i>Ajouter un Projet
+                    <h5 class="modal-title" id="addBassinModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Ajouter un Bassin
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_nom_projet" class="form-label">Nom du Projet</label>
-                        <input type="text" class="form-control" id="id_nom_projet" name="nom_projet" required>
+                        <label class="form-label">Projet</label>
+                        <select class="form-select" name="Id_projet" required>
+                            <option value="">Sélectionnez un projet</option>
+                            {% for projet in projets %}
+                            <option value="{{ projet.Id_projet }}">{{ projet.Nom_projet }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="id_lieu" class="form-label">Lieu</label>
-                        <input type="text" class="form-control" id="id_lieu" name="lieu" required>
+                        <label class="form-label">Volume</label>
+                        <select class="form-select" name="Id_volume" required>
+                            <option value="">Sélectionnez un volume</option>
+                            {% for volume in volumes %}
+                            <option value="{{ volume.Id_volume }}">{{ volume.Volume_disponible }} litres</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="id_date_debut" class="form-label">Date de Début</label>
-                        <input type="date" class="form-control" id="id_date_debut" name="date_debut" required>
+                        <label class="form-label">Surface du Bassin (m²)</label>
+                        <input type="number" class="form-control" name="Surface_bassin" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_date_fin" class="form-label">Date de Fin</label>
-                        <input type="date" class="form-control" id="id_date_fin" name="date_fin" required>
+                        <label class="form-label">Capacité (litres)</label>
+                        <input type="number" class="form-control" name="Capacite" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de Construction</label>
+                        <input type="date" class="form-control" name="Date_construction" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -133,4 +119,92 @@
         </div>
     </div>
 </div>
+
+    <!-- Modales Modifier & Supprimer -->
+    {% for bassin in bassins %}
+    <!-- Modal de modification -->
+<div class="modal fade" id="editBassinModal{{ bassin.Id_bassin }}" tabindex="-1" aria-labelledby="editBassinModalLabel{{ bassin.Id_bassin }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'base:bassin_edit' bassin.Id_bassin %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBassinModalLabel{{ bassin.Id_bassin }}">
+                        <i class="fas fa-edit me-2"></i>Modifier le Bassin
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Projet -->
+                    <div class="mb-3">
+                        <label class="form-label">Projet</label>
+                        <select class="form-select" name="Id_projet" required>
+                            <option value="">Sélectionnez un projet</option>
+                            {% for projet in projets %}
+                                <option value="{{ projet.Id_projet }}" {% if projet.Id_projet == bassin.Id_projet.Id_projet %}selected{% endif %}>{{ projet.Nom_projet }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Volume -->
+                    <div class="mb-3">
+                        <label class="form-label">Volume</label>
+                        <select class="form-select" name="Id_volume" required>
+                            <option value="">Sélectionnez un volume</option>
+                            {% for volume in volumes %}
+                                <option value="{{ volume.Id_volume }}" {% if volume.Id_volume == bassin.Id_volume.Id_volume %}selected{% endif %}>{{ volume.Volume_disponible }} litres</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Surface du Bassin -->
+                    <div class="mb-3">
+                        <label class="form-label">Surface du Bassin (m²)</label>
+                        <input type="number" class="form-control" name="Surface_bassin" value="{{ bassin.Surface_bassin }}" required>
+                    </div>
+
+                    <!-- Capacité -->
+                    <div class="mb-3">
+                        <label class="form-label">Capacité (litres)</label>
+                        <input type="number" class="form-control" name="Capacite" value="{{ bassin.Capacite }}" required>
+                    </div>
+
+                    <!-- Date de Construction -->
+                    <div class="mb-3">
+                        <label class="form-label">Date de Construction</label>
+                        <input type="date" class="form-control" name="Date_construction" value="{{ bassin.Date_construction|date:'Y-m-d' }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Modal de suppression -->
+    <div class="modal fade" id="deleteBassinModal{{ bassin.Id_bassin }}" tabindex="-1" aria-labelledby="deleteBassinModalLabel{{ bassin.Id_bassin }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'base:bassin_delete' bassin.Id_bassin %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteBassinModalLabel{{ bassin.Id_bassin }}">Confirmer la suppression</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Êtes-vous sûr de vouloir supprimer ce bassin ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 {% endblock content %}

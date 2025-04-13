@@ -43,7 +43,6 @@
                 <td>{{ materiau.Unite }}</td>
                 <td>{{ materiau.Quantite_stock }}</td>
                 <td>
-                    <!-- Boutons -->
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editMateriauModal{{ materiau.Id_materiau }}">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </button>
@@ -95,19 +94,21 @@
             <form method="post" action="{% url 'base:materiau_add' %}">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addMateriauModalLabel"><i class="fas fa-plus-circle me-2"></i>Ajouter un Matériau</h5>
+                    <h5 class="modal-title" id="addMateriauModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Ajouter un Matériau
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Projet</label>
-                        <select class="form-select" name="Id_projet">
-                            <option value="">Aucun</option>
+                        <select class="form-select" name="Id_projet" required>
+                            <option value="">Sélectionnez un projet</option>
                             {% for projet in projets %}
-                            <option value="{{ projet.id }}">{{ projet.Nom_projet }} durée de {{ projet.Dure }} jours</option>
+                            <option value="{{ projet.Id_projet }}">{{ projet.Nom_projet }} (Durée: {{ projet.Dure }} jours)</option>
                             {% endfor %}
                         </select>
-                    </div>                    
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Nom du Matériau</label>
                         <input type="text" class="form-control" name="Nom_materiau" required>
@@ -115,13 +116,18 @@
                     <div class="mb-3">
                         <label class="form-label">Unité</label>
                         <select class="form-select" name="Unite" required>
+                            <option value="" disabled selected>-- Sélectionnez une unité --</option>
+                            <option value="m3">Mètre cube</option>
+                            <option value="m2">Mètre carré</option>
+                            <option value="m">Mètre</option>
                             <option value="kg">Kilogramme</option>
                             <option value="g">Grammes</option>
-                            <option value="l">Litres</option>
-                            <option value="m">Mètres</option>
-                            <option value="pcs">Pièces</option>
+                            <option value="tonne">Tonne</option>
+                            <option value="l">Litre</option>
+                            <option value="pcs">Pièce</option>
+                            <option value="sac">Sac</option>
                         </select>
-                    </div>
+                    </div>                    
                     <div class="mb-3">
                         <label class="form-label">Quantité en Stock</label>
                         <input type="number" class="form-control" name="Quantite_stock">
@@ -157,13 +163,15 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Projet</label>
-                        <select class="form-select" name="Id_projet">
-                            <option value="{{ projet.id }}" {% if projet.id == materiau.Id_projet.id %}selected{% endif %}>
-                                {{ projet.Nom_projet }} durée de {{ projet.Dure }} jours
-                            </option>                            
+                        <select class="form-select" name="Id_projet" required>
+                            <option value="">Sélectionnez un projet</option>
+                            {% for projet in projets %}
+                            <option value="{{ projet.Id_projet }}" {% if projet.Id_projet == materiau.Id_projet.Id_projet %}selected{% endif %}>
+                                {{ projet.Nom_projet }} (Durée: {{ projet.Dure }} jours)
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
-                    
                     <div class="mb-3">
                         <label class="form-label">Nom du Matériau</label>
                         <input type="text" class="form-control" name="Nom_materiau" value="{{ materiau.Nom_materiau }}" required>
@@ -171,13 +179,16 @@
                     <div class="mb-3">
                         <label class="form-label">Unité</label>
                         <select class="form-select" name="Unite" required>
+                            <option value="m3" {% if materiau.Unite == "m3" %}selected{% endif %}>Mètre cube</option>
+                            <option value="m2" {% if materiau.Unite == "m2" %}selected{% endif %}>Mètre carré</option>
+                            <option value="m" {% if materiau.Unite == "m" %}selected{% endif %}>Mètre</option>
                             <option value="kg" {% if materiau.Unite == "kg" %}selected{% endif %}>Kilogramme</option>
-                            <option value="g" {% if materiau.Unite == "g" %}selected{% endif %}>Grammes</option>
-                            <option value="l" {% if materiau.Unite == "l" %}selected{% endif %}>Litres</option>
-                            <option value="m" {% if materiau.Unite == "m" %}selected{% endif %}>Mètres</option>
-                            <option value="pcs" {% if materiau.Unite == "pcs" %}selected{% endif %}>Pièces</option>
+                            <option value="tonne" {% if materiau.Unite == "tonne" %}selected{% endif %}>Tonne</option>
+                            <option value="l" {% if materiau.Unite == "l" %}selected{% endif %}>Litre</option>
+                            <option value="pcs" {% if materiau.Unite == "pcs" %}selected{% endif %}>Pièce</option>
+                            <option value="sac" {% if materiau.Unite == "sac" %}selected{% endif %}>Sac</option>
                         </select>
-                    </div>
+                    </div>                    
                     <div class="mb-3">
                         <label class="form-label">Quantité en Stock</label>
                         <input type="number" class="form-control" name="Quantite_stock" value="{{ materiau.Quantite_stock }}">

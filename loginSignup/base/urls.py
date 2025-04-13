@@ -1,6 +1,9 @@
 from django.urls import path, include
 from .views import (
     authView,
+    bassin_add,
+    bassin_delete,
+    bassin_edit,
     bassins,
     fournisseur_add,
     fournisseur_delete,
@@ -15,6 +18,9 @@ from .views import (
     delete_projet,
     projet_edit,
     projets,
+    volume_add,
+    volume_delete,
+    volume_edit,
     volumes,
 )
 
@@ -25,6 +31,9 @@ urlpatterns = [
     path('projets/edit/<int:pk>/', projet_edit, name='projet_edit'),
    path('projets/delete/<int:pk>/', delete_projet, name='projet_delete'),
     path('bassins/', bassins, name='bassins'),
+    path('bassins/add/', bassin_add, name='bassin_add'),
+    path('bassins/edit/<int:pk>/', bassin_edit, name='bassin_edit'),
+    path('bassins/delete/<int:pk>/', bassin_delete, name='bassin_delete'),
     path('fournisseurs/', fournisseurs, name='fournisseurs'),
     path('fournisseurs/add/', fournisseur_add, name='fournisseur_add'),
     path('fournisseurs/edit/<int:pk>/', fournisseur_edit, name='fournisseur_edit'),
@@ -34,6 +43,9 @@ urlpatterns = [
     path('materiaux/edit/<int:pk>/', materiau_edit, name='materiau_edit'),
     path('materiaux/delete/<int:pk>/', materiau_delete, name='materiau_delete'),
     path('volumes/', volumes, name='volumes'),
+    path('volumes/add/', volume_add, name='volume_add'),
+    path('volumes/edit/<int:pk>/', volume_edit, name='volume_edit'),
+    path('volumes/delete/<int:pk>/', volume_delete, name='volume_delete'),
     path("signup/", authView, name="authView"),
     path("accounts/", include("django.contrib.auth.urls")),
 ]
