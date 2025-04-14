@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from requests import Response
@@ -13,6 +14,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
 
 
 @login_required
@@ -29,8 +31,9 @@ def authView(request):
         form = UserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
 
-def logout(self, request):
-    return Response({"detail": "Déconnexion réussie"}, status=200)
+def logout(request):
+    auth_logout(request)
+    return redirect('base:home')
 
 
 @login_required
@@ -398,65 +401,122 @@ def volume_delete(request, pk):
     return redirect('base:volumes')
 
 
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.platypus import (
+    SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer, KeepTogether
+)
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.pdfgen.canvas import Canvas
+import os
+
+class FooterCanvas(Canvas):
+    def __init__(self, *args, **kwargs):
+        Canvas.__init__(self, *args, **kwargs)
+        self.pages = []
+
+    def showPage(self):
+        self.pages.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        for page in self.pages:
+            self.__dict__.update(page)
+            self.draw_footer()
+            Canvas.showPage(self)
+        Canvas.save(self)
+
+    def draw_footer(self):
+        page_num = self._pageNumber
+        text = f"Page {page_num}"
+        self.setFont("Helvetica", 8)
+        self.drawRightString(200 * mm, 10 * mm, text)
 
 @login_required
 def bassin_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="bassins.pdf"'
 
-    # Create a PDF document
-    doc = SimpleDocTemplate(response, pagesize=A4)
-    elements = []
+    # Ajustement des marges (réduites pour une mise en page plus étroite)
+    doc = SimpleDocTemplate(
+        response,
+        pagesize=A4,
+        rightMargin=20,  # Marges plus petites
+        leftMargin=20,   # Marges plus petites
+        topMargin=40,    # Marges plus petites
+        bottomMargin=20  # Marges plus petites
+    )
 
-    # Styles
+    elements = []
     styles = getSampleStyleSheet()
 
-    # Title
-    title = "Liste des Bassins"
-    elements.append(Paragraph(title, styles['Title']))
+    # Style personnalisé pour cellules (y compris Projet)
+    cell_style = ParagraphStyle(
+        name='CellStyle',
+        fontSize=8,
+        alignment=0,  # align left
+        leading=10
+    )
 
-    # Prepare data for the table
-    data = [
-        [
-            'ID', 'Projet', "Volume d'eaux", 'Surface (m²)', 
-            'Capacité (l)', 'Date de const', 
-            'Nb de bassins', 'Sel produit (t)'
-        ]
-    ]
+    # Logo (optionnel)
+    logo_path = os.path.join("static", "img", "logo.png")
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=50, height=50)
+        elements.append(logo)
+
+    # Titre
+    elements.append(Paragraph("Liste des Bassins", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    # En-têtes
+    data = [[
+        'ID', 'Projet', "Volume d'eaux", 'Surface (m²)', 
+        'Capacité (l)', 'Date de const', 'Nb de bassins', 'Sel produit (t)'
+    ]]
+
+    # Données
     bassins = BassinSalins.objects.all()
-
     for bassin in bassins:
-        projet_nom = bassin.Id_projet.Nom_projet.replace(' ', '\n') if bassin.Id_projet else 'N/A'
+        projet_nom = Paragraph(bassin.Id_projet.Nom_projet, cell_style) if bassin.Id_projet else 'N/A'
         volume_eaux = bassin.Id_volume.Volume_disponible if bassin.Id_volume else 'N/A'
         surface = bassin.Surface_bassin or 0
         capacite = bassin.Capacite or 0
         date_construction = bassin.Date_construction.strftime('%d/%m/%Y') if bassin.Date_construction else 'N/A'
         nb_bassins = bassin.Nb_bassin or 0
         sel_produit = f"{bassin.Sel_produit:.2f}" if bassin.Sel_produit else 'N/A'
+
         data.append([
-            bassin.Id_bassin, projet_nom, volume_eaux, surface, 
-            capacite, date_construction, nb_bassins, sel_produit
+            bassin.Id_bassin,
+            projet_nom,
+            volume_eaux,
+            surface,
+            capacite,
+            date_construction,
+            nb_bassins,
+            sel_produit
         ])
 
-    # Adjust column widths for responsiveness
-    col_widths = [50, 100, 100, 80, 80, 100, 80, 100]
+    # Colonnes ajustées
+    col_widths = [30, 110, 75, 55, 55, 70, 50, 70]
 
-    # Create a table
-    table = Table(data, colWidths=col_widths)
+    table = Table(data, colWidths=col_widths, repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#4F81BD")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),  # Colonne Projet à gauche
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTSIZE', (0, 0), (-1, -1), 8),  # Adjust font size for better fit
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#E7E6E6")),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ]))
 
-    elements.append(table)
+    elements.append(KeepTogether(table))
 
-    # Build the PDF
-    doc.build(elements)
-
+    # Génération du PDF avec pagination
+    doc.build(elements, canvasmaker=FooterCanvas)
     return response

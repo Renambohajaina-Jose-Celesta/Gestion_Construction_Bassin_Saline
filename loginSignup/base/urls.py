@@ -48,7 +48,7 @@ urlpatterns = [
     path('volumes/add/', volume_add, name='volume_add'),
     path('volumes/edit/<int:pk>/', volume_edit, name='volume_edit'),
     path('volumes/delete/<int:pk>/', volume_delete, name='volume_delete'),
-    # path("logout/", logout, name="logout"),
+    path("logout/", logout, name="logout"),
     path("signup/", authView, name="authView"),
     path("accounts/", include("django.contrib.auth.urls")),
     path('bassin/pdf/', bassin_pdf, name='bassin_pdf'),
