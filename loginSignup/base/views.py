@@ -1,11 +1,18 @@
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from requests import Response
 from .forms import BassinSalinsForm, FournisseurForm, MateriauForm, ProjetForm, VolumeForm
 
 from .models import BassinSalins, Fournisseurs, Materiaux, Projet, Volumes
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 
 
 @login_required
@@ -21,6 +28,9 @@ def authView(request):
     else:
         form = UserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
+
+def logout(self, request):
+    return Response({"detail": "Déconnexion réussie"}, status=200)
 
 
 @login_required
@@ -386,3 +396,67 @@ def volume_delete(request, pk):
     volume_obj.delete()
     messages.success(request, "Volume supprimé avec succès.")
     return redirect('base:volumes')
+
+
+
+@login_required
+def bassin_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="bassins.pdf"'
+
+    # Create a PDF document
+    doc = SimpleDocTemplate(response, pagesize=A4)
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+
+    # Title
+    title = "Liste des Bassins"
+    elements.append(Paragraph(title, styles['Title']))
+
+    # Prepare data for the table
+    data = [
+        [
+            'ID', 'Projet', "Volume d'eaux", 'Surface (m²)', 
+            'Capacité (l)', 'Date de const', 
+            'Nb de bassins', 'Sel produit (t)'
+        ]
+    ]
+    bassins = BassinSalins.objects.all()
+
+    for bassin in bassins:
+        projet_nom = bassin.Id_projet.Nom_projet.replace(' ', '\n') if bassin.Id_projet else 'N/A'
+        volume_eaux = bassin.Id_volume.Volume_disponible if bassin.Id_volume else 'N/A'
+        surface = bassin.Surface_bassin or 0
+        capacite = bassin.Capacite or 0
+        date_construction = bassin.Date_construction.strftime('%d/%m/%Y') if bassin.Date_construction else 'N/A'
+        nb_bassins = bassin.Nb_bassin or 0
+        sel_produit = f"{bassin.Sel_produit:.2f}" if bassin.Sel_produit else 'N/A'
+        data.append([
+            bassin.Id_bassin, projet_nom, volume_eaux, surface, 
+            capacite, date_construction, nb_bassins, sel_produit
+        ])
+
+    # Adjust column widths for responsiveness
+    col_widths = [50, 100, 100, 80, 80, 100, 80, 100]
+
+    # Create a table
+    table = Table(data, colWidths=col_widths)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),  # Adjust font size for better fit
+    ]))
+
+    elements.append(table)
+
+    # Build the PDF
+    doc.build(elements)
+
+    return response
