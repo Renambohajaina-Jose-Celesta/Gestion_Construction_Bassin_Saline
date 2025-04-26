@@ -1,5 +1,25 @@
 from django import forms
 from .models import Fournisseurs, Materiaux, Projet, Volumes, BassinSalins
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password1', 'password2']
+        labels = {
+            'username': 'Nom d’utilisateur',
+            'password1': 'Mot de passe',
+            'password2': 'Confirmation du mot de passe',
+        }
+        help_texts = {
+            'username': '',
+            'password1': '',
+            'password2': '',
+        }
+
+
 
 class ProjetForm(forms.ModelForm):
     class Meta:

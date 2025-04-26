@@ -1,15 +1,11 @@
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from requests import Response
-from .forms import BassinSalinsForm, FournisseurForm, MateriauForm, ProjetForm, VolumeForm
-
+from .forms import BassinSalinsForm, CustomUserCreationForm, FournisseurForm, ProjetForm, VolumeForm
 from .models import BassinSalins, Fournisseurs, Materiaux, Projet, Volumes
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from reportlab.lib import colors
@@ -23,12 +19,12 @@ def home(request):
 
 def authView(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST or None)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect("base:login")
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
 
 def logout(request):
@@ -85,7 +81,7 @@ def bassins(request):
     paginator = Paginator(bassins_list, 10)
     page_number = request.GET.get('page')
     bassins_page = paginator.get_page(page_number)
-    
+    x
     # Récupérer les projets et volumes pour les formulaires
     projets = Projet.objects.all()
     volumes = Volumes.objects.all()
@@ -223,7 +219,7 @@ def bassin_delete(request, pk):
 @login_required
 def fournisseurs(request):
     fournisseurs = Fournisseurs.objects.all()
-    paginator = Paginator(fournisseurs, 10)  # Affiche 10 fournisseurs par page
+    paginator = Paginator(fournisseurs, 10)
     page_number = request.GET.get('page')
     fournisseurs = paginator.get_page(page_number)
     return render(request, 'pages/fournisseurs.html', {'fournisseurs': fournisseurs})
